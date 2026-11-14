@@ -36,6 +36,10 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/sedes", "/api/categorias").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/registro", "/api/auth/login").permitAll()
+                        // Rutas autenticadas: van ANTES del permitAll de {id}, porque "/mias" también coincide con "/{id}"
+                        .requestMatchers(HttpMethod.GET, "/api/publicaciones/mias").authenticated()
+                        // Listado y detalle públicos
+                        .requestMatchers(HttpMethod.GET, "/api/publicaciones", "/api/publicaciones/{id}").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
                         .anyRequest().authenticated()
                 )

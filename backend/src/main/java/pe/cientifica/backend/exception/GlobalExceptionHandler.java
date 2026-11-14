@@ -18,6 +18,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -86,6 +88,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
         log.error("Error no controlado en {}", request.getRequestURI(), ex);
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", request, null);
+    }
+    // Parámetro con tipo incorrecto: ?sede=abc o ?desde=hola
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
+                                                            HttpServletRequest request) {
+        List<String> detalles = List.of(ex.getName() + ": valor inválido");
+        return build(HttpStatus.BAD_REQUEST, "Parámetro inválido", request, detalles);
+    }
+
+    // Parámetro obligatorio ausente: por ejemplo, falta ?formato=
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParam(MissingServletRequestParameterException ex,
+                                                            HttpServletRequest request) {
+        List<String> detalles = List.of(ex.getParameterName() + ": es obligatorio");
+        return build(HttpStatus.BAD_REQUEST, "Falta un parámetro obligatorio", request, detalles);
     }
 
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String mensaje,
