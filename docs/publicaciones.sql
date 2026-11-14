@@ -121,5 +121,14 @@ INSERT INTO categoria (nombre, descripcion) VALUES
 
 SHOW TABLES;
 SELECT * FROM sede;
-SELECT * FROM categoria;
+SELECT * FROM sede;
 SELECT * FROM usuario;
+
+USE publicaciones;
+
+
+INSERT INTO publicacion (titulo, descripcion, estado, id_usuario, id_categoria, id_sede, fecha_publicacion) VALUES
+('Vendo laptop Lenovo', 'Laptop casi nueva, con cargador, ideal para programar', 'VIGENTE', 2, 2, 1, '2026-11-10 09:00:00'),
+('Taller de Spring Boot', 'Evento gratuito sobre desarrollo backend con Java', 'VIGENTE', 2, 5, 2, '2026-11-12 15:30:00'),
+('Perdí mi calculadora', 'Calculadora científica negra, la perdí cerca de la biblioteca', 'ATENDIDA', 2, 6, 1, '2026-11-13 11:00:00'),
+('Emprendimiento de postres', 'Vendo brownies y tortas por encargo en el campus', 'VIGENTE', 2, 1, 3, '2026-11-14 08:00:00');
