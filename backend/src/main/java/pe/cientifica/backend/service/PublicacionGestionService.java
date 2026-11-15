@@ -5,8 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import pe.cientifica.backend.dto.PublicacionGestionResponse;
 import pe.cientifica.backend.dto.PublicacionRequest;
+import pe.cientifica.backend.dto.PublicacionResponse;
 import pe.cientifica.backend.entity.Categoria;
 import pe.cientifica.backend.entity.EstadoPublicacion;
 import pe.cientifica.backend.entity.Publicacion;
@@ -50,7 +50,7 @@ public class PublicacionGestionService {
      * @throws ResponseStatusException 404 si la sede o la categoría no existen
      */
     @Transactional
-    public PublicacionGestionResponse crear(PublicacionRequest request, Authentication authentication) {
+    public PublicacionResponse crear(PublicacionRequest request, Authentication authentication) {
         Usuario autor = usuarioActual.obtener(authentication);
 
         Publicacion p = new Publicacion();
@@ -58,7 +58,7 @@ public class PublicacionGestionService {
         p.setEstado(EstadoPublicacion.VIGENTE);
         aplicarDatos(p, request);
 
-        return PublicacionGestionResponse.desde(publicacionRepository.save(p));
+        return PublicacionResponse.desde(publicacionRepository.save(p));
     }
 
     /**
@@ -67,10 +67,10 @@ public class PublicacionGestionService {
      * @throws ResponseStatusException 404 si no existe; 403 si el usuario no es el autor
      */
     @Transactional
-    public PublicacionGestionResponse editar(Integer id, PublicacionRequest request, Authentication authentication) {
+    public PublicacionResponse editar(Integer id, PublicacionRequest request, Authentication authentication) {
         Publicacion p = buscarDelAutor(id, authentication);
         aplicarDatos(p, request);
-        return PublicacionGestionResponse.desde(publicacionRepository.save(p));
+        return PublicacionResponse.desde(publicacionRepository.save(p));
     }
 
     /**
@@ -89,18 +89,18 @@ public class PublicacionGestionService {
      * @throws ResponseStatusException 404 si no existe; 403 si el usuario no es el autor
      */
     @Transactional
-    public PublicacionGestionResponse cambiarEstado(Integer id, EstadoPublicacion estado, Authentication authentication) {
+    public PublicacionResponse cambiarEstado(Integer id, EstadoPublicacion estado, Authentication authentication) {
         Publicacion p = buscarDelAutor(id, authentication);
         p.setEstado(estado);
-        return PublicacionGestionResponse.desde(publicacionRepository.save(p));
+        return PublicacionResponse.desde(publicacionRepository.save(p));
     }
 
     /** Publicaciones del usuario autenticado, de la más reciente a la más antigua. */
     @Transactional(readOnly = true)
-    public List<PublicacionGestionResponse> listarMias(Authentication authentication) {
+    public List<PublicacionResponse> listarMias(Authentication authentication) {
         Usuario autor = usuarioActual.obtener(authentication);
         return publicacionRepository.findByUsuarioOrderByFechaPublicacionDesc(autor).stream()
-                .map(PublicacionGestionResponse::desde)
+                .map(PublicacionResponse::desde)
                 .toList();
     }
 

@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pe.cientifica.backend.dto.EstadoPublicacionRequest;
-import pe.cientifica.backend.dto.PublicacionGestionResponse;
 import pe.cientifica.backend.dto.PublicacionRequest;
+import pe.cientifica.backend.dto.PublicacionResponse;
 import pe.cientifica.backend.service.PublicacionGestionService;
 
 import java.util.List;
@@ -32,8 +32,8 @@ public class PublicacionGestionController {
      * Devuelve: 201 con la publicación creada; 400 si hay datos inválidos; 404 si sede o categoría no existen.
      */
     @PostMapping
-    public ResponseEntity<PublicacionGestionResponse> crear(@Valid @RequestBody PublicacionRequest request,
-                                                            Authentication authentication) {
+    public ResponseEntity<PublicacionResponse> crear(@Valid @RequestBody PublicacionRequest request,
+                                                     Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(request, authentication));
     }
 
@@ -42,9 +42,9 @@ public class PublicacionGestionController {
      * Devuelve: 200 con la publicación; 403 si no es el autor; 404 si no existe.
      */
     @PutMapping("/{id}")
-    public PublicacionGestionResponse editar(@PathVariable Integer id,
-                                             @Valid @RequestBody PublicacionRequest request,
-                                             Authentication authentication) {
+    public PublicacionResponse editar(@PathVariable Integer id,
+                                      @Valid @RequestBody PublicacionRequest request,
+                                      Authentication authentication) {
         return service.editar(id, request, authentication);
     }
 
@@ -64,9 +64,9 @@ public class PublicacionGestionController {
      * Devuelve: 200 con la publicación; 400 si el estado es inválido; 403 si no es el autor; 404 si no existe.
      */
     @PatchMapping("/{id}/estado")
-    public PublicacionGestionResponse cambiarEstado(@PathVariable Integer id,
-                                                    @Valid @RequestBody EstadoPublicacionRequest request,
-                                                    Authentication authentication) {
+    public PublicacionResponse cambiarEstado(@PathVariable Integer id,
+                                             @Valid @RequestBody EstadoPublicacionRequest request,
+                                             Authentication authentication) {
         return service.cambiarEstado(id, request.estado(), authentication);
     }
 
@@ -75,7 +75,7 @@ public class PublicacionGestionController {
      * Devuelve: 200 con la lista, de la más reciente a la más antigua.
      */
     @GetMapping("/mias")
-    public List<PublicacionGestionResponse> mias(Authentication authentication) {
+    public List<PublicacionResponse> mias(Authentication authentication) {
         return service.listarMias(authentication);
     }
 }
