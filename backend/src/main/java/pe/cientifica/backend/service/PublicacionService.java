@@ -1,4 +1,3 @@
-
 package pe.cientifica.backend.service;
 
 import org.springframework.http.HttpStatus;
@@ -14,6 +13,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Lógica de consulta de publicaciones: listado con filtros y detalle por id.
+ *
+ * <p>Los métodos son {@code @Transactional(readOnly = true)} porque
+ * {@code open-in-view=false} y las relaciones LAZY deben leerse dentro del service.</p>
+ */
 @Service
 public class PublicacionService {
 
@@ -23,8 +28,15 @@ public class PublicacionService {
         this.publicacionRepository = publicacionRepository;
     }
 
-    
-
+    /**
+     * Lista las publicaciones, de la más reciente a la más antigua, con filtros opcionales.
+     *
+     * @param sede      id de la sede (opcional)
+     * @param categoria id de la categoría (opcional)
+     * @param desde     fecha inicial, inclusive (opcional)
+     * @param hasta     fecha final, inclusive (opcional)
+     * @param q         texto a buscar en título y descripción (opcional)
+     */
     @Transactional(readOnly = true)
     public List<PublicacionResponse> listar(
             Integer sede,
@@ -43,10 +55,15 @@ public class PublicacionService {
         return publicacionRepository.buscar(
                         sede, categoria, fechaDesde, fechaHasta, q)
                 .stream()
-                .map(this::convertirRespuesta)
+                .map(PublicacionResponse::desde)
                 .toList();
     }
 
+    /**
+     * Devuelve el detalle de una publicación.
+     *
+     * @throws ResponseStatusException 404 si no existe
+     */
     @Transactional(readOnly = true)
     public PublicacionResponse obtenerPorId(Integer id) {
         Publicacion publicacion = publicacionRepository.findById(id)
@@ -55,26 +72,6 @@ public class PublicacionService {
                         "Publicación no encontrada"
                 ));
 
-        return convertirRespuesta(publicacion);
-    }
-
-    private PublicacionResponse convertirRespuesta(Publicacion p) {
-        String autorNombre =
-                p.getUsuario().getNombre() + " "
-                        + p.getUsuario().getApellido();
-
-        return new PublicacionResponse(
-                p.getId(),
-                p.getTitulo(),
-                p.getDescripcion(),
-                p.getImagen(),
-                p.getFechaPublicacion(),
-                p.getEstado().name(),
-                p.getCategoria().getId(),
-                p.getCategoria().getNombre(),
-                p.getSede().getId(),
-                p.getSede().getNombre(),
-                autorNombre
-        );
+        return PublicacionResponse.desde(publicacion);
     }
 }
