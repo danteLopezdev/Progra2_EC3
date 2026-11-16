@@ -26,6 +26,7 @@ async function cargarSedes() {
 cargarSedes()*/
 
 import './styles/auth.css'
+import './styles/inicio.css'
 import { mostrarInicio } from './pages/inicio'
 import { mostrarLogin } from './pages/login'
 import { mostrarRegistro } from './pages/registro'
