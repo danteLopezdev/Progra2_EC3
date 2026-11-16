@@ -28,3 +28,7 @@ export function obtenerRol(): Rol | null {
 export function cerrarSesion(): void {
   localStorage.removeItem(CLAVE)
 }
+
+export function esAdministrador(): boolean {
+  return obtenerRol() === 'ADMINISTRADOR'
+}
