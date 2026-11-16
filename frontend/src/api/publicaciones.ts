@@ -1,5 +1,6 @@
 import type { FiltrosPublicaciones, Publicacion } from '../types/Publicacion'
 import { errorDesdeRespuesta } from './ApiError'
+import { fetchAutenticado } from './cliente'
 
 /**
  * Lista publicaciones con filtros opcionales.
@@ -20,4 +21,21 @@ export async function listarPublicaciones(
   const respuesta = await fetch(`/api/publicaciones${consulta ? `?${consulta}` : ''}`)
   if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
   return (await respuesta.json()) as Publicacion[]
+}
+
+/** Detalle de una publicación. Ruta pública: 404 si no existe. */
+export async function obtenerPublicacion(id: number): Promise<Publicacion> {
+  const respuesta = await fetch(`/api/publicaciones/${id}`)
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
+  return (await respuesta.json()) as Publicacion
+}
+
+/** Reporta una publicación (requiere sesión). 201, o 400/404/409 como ApiError. */
+export async function reportarPublicacion(id: number, motivo: string): Promise<void> {
+  const respuesta = await fetchAutenticado(`/api/publicaciones/${id}/reportes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ motivo }),
+  })
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
 }

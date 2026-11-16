@@ -13,3 +13,14 @@
 .estado-atendida { background: #fff3c4; }
 .estado-finalizada { background: #ddd; }
 .aviso { grid-column: 1 / -1; }
+
+.tarjeta h3 a { text-decoration: none; color: inherit; }
+.tarjeta h3 a:hover { text-decoration: underline; }
+
+.detalle { max-width: 720px; }
+.volver { display: block; width: fit-content; margin-bottom: 1rem; }
+.descripcion-completa { white-space: pre-wrap; }
+.reporte { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ccc; }
+.reporte textarea { display: block; width: 100%; margin: 0.5rem 0; }
+.errores p { color: #b00020; margin: 0.25rem 0; }
+.exito { color: #1b6e2f; }

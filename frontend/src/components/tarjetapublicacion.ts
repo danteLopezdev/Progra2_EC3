@@ -10,7 +10,10 @@ export function crearTarjeta(p: Publicacion): HTMLElement {
   estado.textContent = p.estado
 
   const titulo = document.createElement('h3')
-  titulo.textContent = p.titulo
+  const enlace = document.createElement('a')
+  enlace.href = `#/publicacion/${p.id}`
+  enlace.textContent = p.titulo
+  titulo.append(enlace)
 
   const descripcion = document.createElement('p')
   descripcion.className = 'descripcion'
