@@ -12,6 +12,10 @@ export function crearNavbar(): HTMLElement {
 
   const sesion = obtenerSesion()
   if (sesion) {
+    const mias = document.createElement('a')
+    mias.href = '#/mias'
+    mias.textContent = 'Mis publicaciones'
+    barra.append(mias)
     // Los enlaces a #/mias, #/nueva y #/admin se agregan cuando existan esas pantallas.
     const nueva = document.createElement('a')
     nueva.href = '#/nueva'

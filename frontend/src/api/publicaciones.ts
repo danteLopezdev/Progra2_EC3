@@ -1,4 +1,4 @@
-import type { FiltrosPublicaciones, Publicacion } from '../types/Publicacion'
+import type { EstadoPublicacion, FiltrosPublicaciones, Publicacion, PublicacionRequest } from '../types/Publicacion'
 import { errorDesdeRespuesta } from './ApiError'
 import { fetchAutenticado } from './cliente'
 
@@ -40,8 +40,6 @@ export async function reportarPublicacion(id: number, motivo: string): Promise<v
   if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
 }
 
-import type { PublicacionRequest } from '../types/Publicacion'
-// (súmalo al import de tipos que ya tienes arriba)
 
 /** Crea una publicación (requiere sesión). 201, o 400/404 como ApiError. */
 export async function crearPublicacion(datos: PublicacionRequest): Promise<Publicacion> {
@@ -63,4 +61,31 @@ export async function editarPublicacion(id: number, datos: PublicacionRequest): 
   })
   if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
   return (await respuesta.json()) as Publicacion
+}
+
+/** Publicaciones del usuario autenticado (más recientes primero). */
+export async function listarMisPublicaciones(): Promise<Publicacion[]> {
+  const respuesta = await fetchAutenticado('/api/publicaciones/mias')
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
+  return (await respuesta.json()) as Publicacion[]
+}
+
+/** Cambia el estado de una publicación propia. 200, o 400/403/404 como ApiError. */
+export async function cambiarEstadoPublicacion(
+  id: number,
+  estado: EstadoPublicacion,
+): Promise<Publicacion> {
+  const respuesta = await fetchAutenticado(`/api/publicaciones/${id}/estado`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ estado }),
+  })
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
+  return (await respuesta.json()) as Publicacion
+}
+
+/** Elimina una publicación propia. 204 sin cuerpo, o 403/404 como ApiError. */
+export async function eliminarPublicacion(id: number): Promise<void> {
+  const respuesta = await fetchAutenticado(`/api/publicaciones/${id}`, { method: 'DELETE' })
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
 }

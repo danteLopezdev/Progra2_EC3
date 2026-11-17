@@ -29,3 +29,8 @@
 .formulario-publicacion input,
 .formulario-publicacion textarea,
 .formulario-publicacion select { display: block; width: 100%; margin-top: 0.25rem; }
+.item-mia { display: flex; flex-direction: column; gap: 0.5rem; }
+.acciones { display: flex; gap: 0.5rem; align-items: center; }
+.boton, .boton-peligro { padding: 0.35rem 0.8rem; border-radius: 6px; cursor: pointer; text-decoration: none; }
+.boton-peligro { background: #c62828; color: #fff; border: none; }
+.boton-peligro:disabled { opacity: 0.6; cursor: not-allowed; }
