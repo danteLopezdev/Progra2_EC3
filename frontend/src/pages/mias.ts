@@ -4,7 +4,7 @@ import {
   listarMisPublicaciones,
 } from '../api/publicaciones'
 import { crearNavbar } from '../components/navbar'
-import { crearTarjeta } from '../components/tarjetapublicacion'
+import { crearTarjeta } from '../components/tarjetaPublicacion'
 import type { EstadoPublicacion, Publicacion } from '../types/Publicacion'
 import { el, mensajesDeError, mostrarMensajes } from '../utils/dom'
 import { obtenerSesion } from '../utils/sesion'
