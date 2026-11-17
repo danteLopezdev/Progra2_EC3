@@ -21,6 +21,12 @@ export function crearNavbar(): HTMLElement {
     nueva.href = '#/nueva'
     nueva.textContent = 'Nueva publicación'
     barra.append(nueva)
+    if (esAdministrador()) {
+      const admin = document.createElement('a')
+      admin.href = '#/admin'
+      admin.textContent = 'Administración'
+      barra.append(admin)
+    }
     const saludo = document.createElement('span')
     saludo.className = 'saludo'
     saludo.textContent = `Hola, ${sesion.nombre} (${sesion.rol})` // nombre escrito por un usuario

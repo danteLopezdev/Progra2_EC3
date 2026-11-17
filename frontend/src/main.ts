@@ -6,6 +6,7 @@ import { mostrarInicio } from './pages/inicio'
 import { mostrarLogin } from './pages/login'
 import { mostrarRegistro } from './pages/registro'
 import { mostrarMias } from './pages/mias'
+import { mostrarAdmin } from './pages/admin'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
@@ -21,6 +22,8 @@ function enrutar(): void {
   else if (detalle) void mostrarDetalle(app, Number(detalle[1]))
   else if (ruta === '#/nueva') void mostrarEditor(app)
   else if (ruta === '#/mias') void mostrarMias(app)
+  else if (ruta === '#/mias') void mostrarMias(app)
+  else if (ruta === '#/admin') void mostrarAdmin(app)
   else void mostrarInicio(app)
 }
 

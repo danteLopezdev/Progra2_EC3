@@ -34,3 +34,9 @@
 .boton, .boton-peligro { padding: 0.35rem 0.8rem; border-radius: 6px; cursor: pointer; text-decoration: none; }
 .boton-peligro { background: #c62828; color: #fff; border: none; }
 .boton-peligro:disabled { opacity: 0.6; cursor: not-allowed; }
+.exportar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
+.exportar h2 { width: 100%; margin: 0 0 0.25rem; }
+.lista-reportes { display: grid; gap: 1rem; margin-top: 1rem; }
+.estado-pendiente { background: #fff3cd; color: #7a5b00; }
+.estado-revisado { background: #d4edda; color: #1d5c2e; }
+.estado-descartado { background: #e2e3e5; color: #41464b; }
