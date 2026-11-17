@@ -13,9 +13,10 @@ export function crearNavbar(): HTMLElement {
   const sesion = obtenerSesion()
   if (sesion) {
     // Los enlaces a #/mias, #/nueva y #/admin se agregan cuando existan esas pantallas.
-    if (esAdministrador()) {
-      // reservado para el panel de administración
-    }
+    const nueva = document.createElement('a')
+    nueva.href = '#/nueva'
+    nueva.textContent = 'Nueva publicación'
+    barra.append(nueva)
     const saludo = document.createElement('span')
     saludo.className = 'saludo'
     saludo.textContent = `Hola, ${sesion.nombre} (${sesion.rol})` // nombre escrito por un usuario

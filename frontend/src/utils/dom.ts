@@ -18,3 +18,15 @@ export function mostrarMensajes(caja: HTMLElement, mensajes: string[]): void {
     caja.appendChild(linea)
   }
 }
+
+/** Crea un elemento con clase y texto (siempre textContent, nunca innerHTML). */
+export function el<K extends keyof HTMLElementTagNameMap>(
+  etiqueta: K,
+  clase?: string,
+  texto?: string,
+): HTMLElementTagNameMap[K] {
+  const nodo = document.createElement(etiqueta)
+  if (clase) nodo.className = clase
+  if (texto !== undefined) nodo.textContent = texto
+  return nodo
+}

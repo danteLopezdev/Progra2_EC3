@@ -39,3 +39,28 @@ export async function reportarPublicacion(id: number, motivo: string): Promise<v
   })
   if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
 }
+
+import type { PublicacionRequest } from '../types/Publicacion'
+// (súmalo al import de tipos que ya tienes arriba)
+
+/** Crea una publicación (requiere sesión). 201, o 400/404 como ApiError. */
+export async function crearPublicacion(datos: PublicacionRequest): Promise<Publicacion> {
+  const respuesta = await fetchAutenticado('/api/publicaciones', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos),
+  })
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
+  return (await respuesta.json()) as Publicacion
+}
+
+/** Edita una publicación propia. 200, o 400/403/404 como ApiError. */
+export async function editarPublicacion(id: number, datos: PublicacionRequest): Promise<Publicacion> {
+  const respuesta = await fetchAutenticado(`/api/publicaciones/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos),
+  })
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
+  return (await respuesta.json()) as Publicacion
+}

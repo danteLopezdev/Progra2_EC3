@@ -23,3 +23,11 @@ export interface FiltrosPublicaciones {
   hasta?: string // AAAA-MM-DD
   q?: string
 }
+
+/** Cuerpo de POST y PUT /api/publicaciones. Autor, estado y fecha los decide el servidor. */
+export interface PublicacionRequest {
+  titulo: string
+  descripcion: string
+  idSede: number | null // null si no eligió: el servidor responde 400 "La sede es obligatoria"
+  idCategoria: number | null
+}

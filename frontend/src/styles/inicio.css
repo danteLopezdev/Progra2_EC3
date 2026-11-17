@@ -24,3 +24,8 @@
 .reporte textarea { display: block; width: 100%; margin: 0.5rem 0; }
 .errores p { color: #b00020; margin: 0.25rem 0; }
 .exito { color: #1b6e2f; }
+.formulario-publicacion { max-width: 720px; }
+.formulario-publicacion label { display: block; margin-bottom: 0.75rem; }
+.formulario-publicacion input,
+.formulario-publicacion textarea,
+.formulario-publicacion select { display: block; width: 100%; margin-top: 0.25rem; }
