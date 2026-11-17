@@ -7,6 +7,9 @@ import { mostrarLogin } from './pages/login'
 import { mostrarRegistro } from './pages/registro'
 import { mostrarMias } from './pages/mias'
 import { mostrarAdmin } from './pages/admin'
+import './styles/auth.css'
+import './styles/inicio.css'
+import './styles/tema.css'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
