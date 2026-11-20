@@ -2,6 +2,9 @@ import type { Categoria } from '../types/Categoria'
 import type { Publicacion, PublicacionRequest } from '../types/Publicacion'
 import type { Sede } from '../types/Sede'
 import { el, mensajesDeError, mostrarMensajes } from '../utils/dom'
+import { quitarImagen, urlImagen } from '../api/publicaciones'
+
+const MAX_BYTES_IMAGEN = 2 * 1024 * 1024 // comodidad; la garantía real es el servidor
 
 function crearSelect(
   nombre: string,
@@ -31,14 +34,15 @@ function campo(etiqueta: string, control: HTMLElement): HTMLLabelElement {
 /**
  * Formulario compartido por "crear" y "editar".
  * @param inicial publicación a precargar (edición) o null (creación)
- * @param alEnviar acción a ejecutar con los datos; si lanza, el error se muestra en el formulario
+ * @param alEnviar acción a ejecutar con los datos y la imagen elegida (o null);
+ *                 si lanza, el error se muestra en el formulario
  */
 export function crearFormularioPublicacion(
   sedes: Sede[],
   categorias: Categoria[],
   inicial: Publicacion | null,
   textoBoton: string,
-  alEnviar: (datos: PublicacionRequest) => Promise<void>,
+  alEnviar: (datos: PublicacionRequest, imagen: File | null) => Promise<void>,
 ): HTMLFormElement {
   const form = el('form', 'formulario-publicacion')
   form.noValidate = true // el error que se muestra es el del servidor
@@ -58,6 +62,33 @@ export function crearFormularioPublicacion(
   const sede = crearSelect('sede', sedes, inicial?.sedeId ?? null)
   const categoria = crearSelect('categoria', categorias, inicial?.categoriaId ?? null)
 
+  const entradaImagen = el('input')
+  entradaImagen.name = 'imagen'
+  entradaImagen.type = 'file'
+  entradaImagen.accept = 'image/jpeg,image/png,image/webp'
+    // Imagen actual (solo al editar una publicación que ya tiene imagen)
+  const bloqueActual = el('div', 'imagen-actual')
+  if (inicial?.imagen) {
+    const previa = el('img', 'imagen-publicacion')
+    previa.src = urlImagen(inicial.imagen)
+    previa.alt = 'Imagen actual de la publicación' // propiedad, no HTML
+
+    const botonQuitar = el('button', 'boton-peligro', 'Quitar imagen')
+    botonQuitar.type = 'button' // para que NO envíe el formulario
+    botonQuitar.addEventListener('click', async () => {
+      if (!confirm('¿Quitar la imagen de esta publicación?')) return
+      botonQuitar.disabled = true
+      try {
+        await quitarImagen(inicial.id)
+        bloqueActual.replaceChildren(el('p', 'aviso', 'Imagen eliminada.'))
+      } catch (error) {
+        mostrarMensajes(errores, mensajesDeError(error))
+        botonQuitar.disabled = false
+      }
+    })
+    bloqueActual.append(previa, botonQuitar)
+  }
+
   const errores = el('div', 'errores')
   errores.setAttribute('role', 'alert')
 
@@ -65,25 +96,42 @@ export function crearFormularioPublicacion(
   boton.type = 'submit'
 
   form.append(
-    campo('Título', titulo),
-    campo('Descripción', descripcion),
-    campo('Sede', sede),
-    campo('Categoría', categoria),
-    errores,
-    boton,
-  )
+  campo('Título', titulo),          // igual que antes
+  campo('Descripción', descripcion),
+  campo('Sede', sede),
+  campo('Categoría', categoria),
+  bloqueActual,                     // NUEVO: imagen actual + botón "Quitar imagen"
+                                    // (vacío si la publicación no tiene imagen o es nueva)
+  campo(
+    // la etiqueta depende de si ya hay imagen
+    inicial?.imagen ? 'Reemplazar imagen (opcional, máx. 2 MB)' : 'Imagen (opcional, máx. 2 MB)',
+    entradaImagen,                  // el input de archivo
+  ),
+  errores,                          // igual que antes
+  boton,                            // igual que antes
+)
 
   form.addEventListener('submit', async (evento) => {
     evento.preventDefault()
     mostrarMensajes(errores, [])
+
+    const archivo = entradaImagen.files?.[0] ?? null
+    if (archivo && archivo.size > MAX_BYTES_IMAGEN) {
+      mostrarMensajes(errores, ['La imagen no puede superar los 2 MB'])
+      return
+    }
+
     boton.disabled = true
     try {
-      await alEnviar({
-        titulo: titulo.value.trim(),
-        descripcion: descripcion.value.trim(),
-        idSede: sede.value ? Number(sede.value) : null,
-        idCategoria: categoria.value ? Number(categoria.value) : null,
-      })
+      await alEnviar(
+        {
+          titulo: titulo.value.trim(),
+          descripcion: descripcion.value.trim(),
+          idSede: sede.value ? Number(sede.value) : null,
+          idCategoria: categoria.value ? Number(categoria.value) : null,
+        },
+        archivo,
+      )
     } catch (error) {
       mostrarMensajes(errores, mensajesDeError(error)) // 400 con detalles, 403 o 404
       boton.disabled = false

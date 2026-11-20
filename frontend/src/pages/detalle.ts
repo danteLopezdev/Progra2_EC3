@@ -1,4 +1,4 @@
-import { obtenerPublicacion, reportarPublicacion } from '../api/publicaciones'
+import { obtenerPublicacion, reportarPublicacion, urlImagen } from '../api/publicaciones'
 import { crearNavbar } from '../components/navbar'
 import type { Publicacion } from '../types/Publicacion'
 import { mensajesDeError, mostrarMensajes } from '../utils/dom'
@@ -47,7 +47,16 @@ function crearContenido(p: Publicacion): HTMLElement {
   const meta = el('p', 'meta', `${p.sedeNombre} · ${p.categoriaNombre} · ${fecha} · por ${p.autorNombre}`)
   const descripcion = el('p', 'descripcion-completa', p.descripcion)
 
-  articulo.append(crearVolver(), estado, titulo, meta, descripcion, crearSeccionReporte(p.id))
+  articulo.append(crearVolver(), estado, titulo)
+
+  if (p.imagen) {
+    const img = el('img', 'imagen-detalle')
+    img.src = urlImagen(p.imagen)
+    img.alt = p.titulo // propiedad, no HTML
+    articulo.append(img)
+  }
+
+  articulo.append(meta, descripcion, crearSeccionReporte(p.id))
   return articulo
 }
 

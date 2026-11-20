@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/publicaciones/mias").authenticated()
                         // Listado y detalle públicos
                         .requestMatchers(HttpMethod.GET, "/api/publicaciones", "/api/publicaciones/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/imagenes/*").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
                         .anyRequest().authenticated()
                 )

@@ -11,15 +11,17 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -66,7 +68,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleMediaType(HttpServletRequest request) {
-        return build(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Content-Type no soportado, usa application/json", request, null);
+        return build(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Content-Type no soportado", request, null);
     }
 
     // Respaldo de la BD (por ejemplo, UNIQUE violado en una condición de carrera)
@@ -83,12 +85,6 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.FORBIDDEN, "No tienes permiso para realizar esta acción", request, null);
     }
 
-    // Cualquier otro error: se registra en el servidor y NO se expone el detalle al cliente
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
-        log.error("Error no controlado en {}", request.getRequestURI(), ex);
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", request, null);
-    }
     // Parámetro con tipo incorrecto: ?sede=abc o ?desde=hola
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
@@ -103,6 +99,27 @@ public class GlobalExceptionHandler {
                                                             HttpServletRequest request) {
         List<String> detalles = List.of(ex.getParameterName() + ": es obligatorio");
         return build(HttpStatus.BAD_REQUEST, "Falta un parámetro obligatorio", request, detalles);
+    }
+
+    // Imagen más grande que spring.servlet.multipart.max-file-size: 413
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUpload(HttpServletRequest request) {
+        return build(HttpStatus.PAYLOAD_TOO_LARGE, "La imagen no puede superar los 2 MB", request, null);
+    }
+
+    // Falta la parte multipart "archivo": 400 (solo se devuelve el nombre de la parte)
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingPart(MissingServletRequestPartException ex,
+                                                           HttpServletRequest request) {
+        List<String> detalles = List.of(ex.getRequestPartName() + ": es obligatorio");
+        return build(HttpStatus.BAD_REQUEST, "Falta un archivo obligatorio", request, detalles);
+    }
+
+    // Cualquier otro error: se registra en el servidor y NO se expone el detalle al cliente
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
+        log.error("Error no controlado en {}", request.getRequestURI(), ex);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", request, null);
     }
 
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String mensaje,

@@ -1,9 +1,19 @@
+import { urlImagen } from '../api/publicaciones'
 import type { Publicacion } from '../types/Publicacion'
 
 /** Tarjeta de una publicación. Todo dato del servidor entra con textContent. */
 export function crearTarjeta(p: Publicacion): HTMLElement {
   const tarjeta = document.createElement('article')
   tarjeta.className = 'tarjeta'
+
+  if (p.imagen) {
+    const img = document.createElement('img')
+    img.src = urlImagen(p.imagen)
+    img.alt = p.titulo // propiedad, no HTML
+    img.loading = 'lazy'
+    img.className = 'imagen-publicacion'
+    tarjeta.append(img)
+  }
 
   const estado = document.createElement('span')
   estado.className = `estado estado-${p.estado.toLowerCase()}`

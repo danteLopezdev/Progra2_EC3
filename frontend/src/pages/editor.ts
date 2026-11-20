@@ -1,4 +1,9 @@
-import { crearPublicacion, editarPublicacion, obtenerPublicacion } from '../api/publicaciones'
+import {
+  crearPublicacion,
+  editarPublicacion,
+  obtenerPublicacion,
+  subirImagen,
+} from '../api/publicaciones'
 import { obtenerCategorias } from '../api/categorias'
 import { obtenerSedes } from '../api/sedes'
 import { crearFormularioPublicacion } from '../components/formularioPublicacion'
@@ -10,6 +15,8 @@ import { obtenerSesion } from '../utils/sesion'
  * Pantalla de crear (#/nueva) o editar (#/editar/{id}) una publicación.
  * Exige sesión. Si se edita una publicación ajena, el servidor responde 403
  * al enviar y el formulario muestra el mensaje.
+ *
+ * Flujo de guardado: 1) crear/editar (JSON), 2) si hay imagen, subirla (multipart).
  */
 export async function mostrarEditor(contenedor: HTMLElement, id?: number): Promise<void> {
   if (!obtenerSesion()) {
@@ -33,9 +40,23 @@ export async function mostrarEditor(contenedor: HTMLElement, id?: number): Promi
       categorias,
       existente,
       id === undefined ? 'Publicar' : 'Guardar cambios',
-      async (datos) => {
+      async (datos, imagen) => {
+        // Paso 1: si esto falla, el error sube al formulario y se puede reintentar sin duplicar
         const guardada =
           id === undefined ? await crearPublicacion(datos) : await editarPublicacion(id, datos)
+
+        // Paso 2: la publicación ya existe; un fallo aquí NO se relanza
+        if (imagen) {
+          try {
+            await subirImagen(guardada.id, imagen)
+          } catch (error) {
+            alert(
+              'La publicación se guardó, pero la imagen no se pudo subir: ' +
+                mensajesDeError(error).join(' ') +
+                '\nPuedes intentarlo de nuevo desde "Editar".',
+            )
+          }
+        }
         location.hash = `#/publicacion/${guardada.id}`
       },
     )

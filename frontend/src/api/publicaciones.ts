@@ -89,3 +89,25 @@ export async function eliminarPublicacion(id: number): Promise<void> {
   const respuesta = await fetchAutenticado(`/api/publicaciones/${id}`, { method: 'DELETE' })
   if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
 }
+
+
+export async function subirImagen(id: number, archivo: File): Promise<Publicacion> {
+  const datos = new FormData()
+  datos.append('archivo', archivo)
+  // Sin cabecera Content-Type: el navegador pone el boundary del multipart
+  const respuesta = await fetchAutenticado(`/api/publicaciones/${id}/imagen`, {
+    method: 'POST',
+    body: datos,
+  })
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
+  return respuesta.json()
+}
+
+export async function quitarImagen(id: number): Promise<void> {
+  const respuesta = await fetchAutenticado(`/api/publicaciones/${id}/imagen`, { method: 'DELETE' })
+  if (!respuesta.ok) throw await errorDesdeRespuesta(respuesta)
+}
+
+export function urlImagen(nombre: string): string {
+  return `/api/imagenes/${encodeURIComponent(nombre)}`
+}
