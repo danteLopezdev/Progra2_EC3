@@ -1,5 +1,3 @@
-import './styles/auth.css'
-import './styles/inicio.css'
 import { mostrarDetalle } from './pages/detalle'
 import { mostrarEditor } from './pages/editor'
 import { mostrarInicio } from './pages/inicio'
@@ -7,9 +5,10 @@ import { mostrarLogin } from './pages/login'
 import { mostrarRegistro } from './pages/registro'
 import { mostrarMias } from './pages/mias'
 import { mostrarAdmin } from './pages/admin'
-import './styles/auth.css'
-import './styles/inicio.css'
-import './styles/tema.css'
+import "./styles/tema.css";
+import "./styles/auth.css";
+import "./styles/inicio.css";
+import "./styles/footer.css";
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
