@@ -1,5 +1,6 @@
 package pe.cientifica.backend.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,13 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    /**
+     * Cantidad máxima de usuarios registrados (incluye al administrador).
+     * Se puede cambiar con la propiedad app.max-usuarios (en Railway: APP_MAX_USUARIOS).
+     */
+    @Value("${app.max-usuarios:9}")
+    private long maxUsuarios;
+
     public AuthService(UsuarioRepository usuarioRepository,
                        PasswordEncoder passwordEncoder,
                        JwtService jwtService) {
@@ -27,7 +35,18 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
+    /**
+     * Registra un estudiante nuevo.
+     *
+     * @throws ResponseStatusException 403 si se alcanzó el límite de usuarios;
+     *                                 409 si el correo ya está registrado
+     */
     public void registrar(RegistroRequest request) {
+        if (usuarioRepository.count() >= maxUsuarios) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Se alcanzó el límite de usuarios registrados");
+        }
+
         String correo = request.correo().trim().toLowerCase();
 
         if (usuarioRepository.existsByCorreo(correo)) {
